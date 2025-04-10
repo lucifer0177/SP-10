@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - StockPredictAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='css/portfolio.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line me-2"></i>StockPredictAI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market-news">Market News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/watchlist">Watchlist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/portfolio">Portfolio</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-outline-light me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</button>
+                    <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#signupModal">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid main-container">
+        <header class="text-center py-4 header-styling mb-4">
+            <h1 aria-label="Portfolio">Portfolio</h1>
+            <p class="lead">Track your investments and analyze performance</p>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4">
+                <div class="glass-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Portfolio Summary</h5>
+                        <div class="portfolio-value">
+                            <div class="value-label">Total Value</div>
+                            <div class="value-amount">$128,452.37</div>
+                            <div class="value-change positive">
+                                <i class="fas fa-arrow-up"></i> $1,256.83 (+0.99%)
+                            </div>
+                            <div class="time-periods">
+                                <button class="btn btn-sm time-btn active" data-period="1d">1D</button>
+                                <button class="btn btn-sm time-btn" data-period="1w">1W</button>
+                                <button class="btn btn-sm time-btn" data-period="1m">1M</button>
+                                <button class="btn btn-sm time-btn" data-period="3m">3M</button>
+                                <button class="btn btn-sm time-btn" data-period="1y">1Y</button>
+                                <button class="btn btn-sm time-btn" data-period="all">All</button>
+                            </div>
+                        </div>
+                        <div class="portfolio-stats mt-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Day Gain/Loss</div>
+                                        <div class="stat-value positive">+$1,256.83</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Total Gain/Loss</div>
+                                        <div class="stat-value positive">+$28,452.37</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Cash Balance</div>
+                                        <div class="stat-value">$12,845.23</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Buying Power</div>
+                                        <div class="stat-value">$25,690.46</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio-chart-container mt-4">
+                            <canvas id="portfolioValueChart"></canvas>
+                        </div>
+                        <div class="portfolio-actions mt-4">
+                            <button class="btn btn-outline-light me-2" data-bs-toggle="modal" data-bs-target="#depositModal">Deposit</button>
+                            <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#tradeModal">Trade</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8 mb-4">
+                <div class="glass-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Portfolio Allocation</h5>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="allocation-chart-container">
+                                    <canvas id="allocationChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="allocation-breakdown">
+                                    <h6 class="breakdown-title">Holdings Breakdown</h6>
+                                    <div class="allocation-item">
+                                        <div class="allocation-color" style="background-color: #4dacff;"></div>
+                                        <div class="allocation-details">
+                                            <div class="allocation-name">Technology</div>
+                                            <div class="allocation-value">$56,518.04 (44%)</div>
+                                        </div>
+                                        <div class="allocation-bar">
+                                            <div class="allocation-progress" style="width: 44%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="allocation-item">
+                                        <div class="allocation-color" style="background-color: #4cd964;"></div>
+                                        <div class="allocation-details">
+                                            <div class="allocation-name">Healthcare</div>
+                                            <div class="allocation-value">$25,690.47 (20%)</div>
+                                        </div>
+                                        <div class="allocation-bar">
+                                            <div class="allocation-progress" style="width: 20%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="allocation-item">
+                                        <div class="allocation-color" style="background-color: #ffcc00;"></div>
+                                        <div class="allocation-details">
+                                            <div class="allocation-name">Financial Services</div>
+                                            <div class="allocation-value">$15,414.28 (12%)</div>
+                                        </div>
+                                        <div class="allocation-bar">
+                                            <div class="allocation-progress" style="width: 12%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="allocation-item">
+                                        <div class="allocation-color" style="background-color: #ff9500;"></div>
+                                        <div class="allocation-details">
+                                            <div class="allocation-name">Consumer Cyclical</div>
+                                            <div class="allocation-value">$10,276.19 (8%)</div>
+                                        </div>
+                                        <div class="allocation-bar">
+                                            <div class="allocation-progress" style="width: 8%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="allocation-item">
+                                        <div class="allocation-color" style="background-color: #ff3b30;"></div>
+                                        <div class="allocation-details">
+                                            <div class="allocation-name">Energy</div>
+                                            <div class="allocation-value">$7,707.14 (6%)</div>
+                                        </div>
+                                        <div class="allocation-bar">
+                                            <div class="allocation-progress" style="width: 6%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="allocation-item">
+                                        <div class="allocation-color" style="background-color: #a2a2a2;"></div>
+                                        <div class="allocation-details">
+                                            <div class="allocation-name">Cash</div>
+                                            <div class="allocation-value">$12,845.23 (10%)</div>
+                                        </div>
+                                        <div class="allocation-bar">
+                                            <div class="allocation-progress" style="width: 10%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6>Portfolio Health</h6>
+                                <div class="health-score">
+                                    <span class="score-value">78</span>
+                                    <span class="score-max">/100</span>
+                                </div>
+                            </div>
+                            <div class="health-metrics">
+                                <div class="health-metric">
+                                    <div class="metric-name">Diversification</div>
+                                    <div class="metric-bar">
+                                        <div class="metric-progress" style="width: 65%"></div>
+                                    </div>
+                                    <div class="metric-rating">Good</div>
+                                </div>
+                                <div class="health-metric">
+                                    <div class="metric-name">Risk Level</div>
+                                    <div class="metric-bar">
+                                        <div class="metric-progress" style="width: 82%"></div>
+                                    </div>
+                                    <div class="metric-rating">Moderate</div>
+                                </div>
+                                <div class="health-metric">
+                                    <div class="metric-name">Performance</div>
+                                    <div class="metric-bar">
+                                        <div class="metric-progress" style="width: 88%"></div>
+                                    </div>
+                                    <div class="metric-rating">Excellent</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="glass-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title m-0">Holdings</h5>
+                            <div class="d-flex gap-2">
+                                <div class="input-group input-group-sm search-input" style="width: 200px;">
+                                    <input type="text" class="form-control custom-input" placeholder="Search holdings" id="searchHoldings">
+                                    <button class="btn btn-outline-light" type="button"><i class="fas fa-search"></i></button>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm filter-btn dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-sort"></i> Sort
+                                    </button>
+                                    <ul class="dropdown-menu filter-dropdown" aria-labelledby="sortDropdown">
+                                        <li><a class="dropdown-item" href="#" data-sort="name">Name (A-Z)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-sort="value-desc">Value (High-Low)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-sort="value-asc">Value (Low-High)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-sort="gain-desc">Gain (High-Low)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-sort="gain-asc">Gain (Low-High)</a></li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-sm btn-gradient" data-bs-toggle="modal" data-bs-target="#tradeModal">
+                                    <i class="fas fa-plus"></i> Add Position
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover portfolio-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th>Shares</th>
+                                        <th>Avg. Cost</th>
+                                        <th>Current Price</th>
+                                        <th>Today's Return</th>
+                                        <th>Total Return</th>
+                                        <th>Market Value</th>
+                                        <th>% of Portfolio</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="position-row">
+                                        <td>AAPL</td>
+                                        <td>Apple Inc.</td>
+                                        <td>85</td>
+                                        <td>$198.32</td>
+                                        <td>$246.78</td>
+                                        <td class="positive">+$299.20 (+1.45%)</td>
+                                        <td class="positive">+$4,119.30 (+24.43%)</td>
+                                        <td>$20,976.30</td>
+                                        <td>16.33%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="AAPL" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="AAPL" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="AAPL" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>MSFT</td>
+                                        <td>Microsoft Corporation</td>
+                                        <td>60</td>
+                                        <td>$328.45</td>
+                                        <td>$412.36</td>
+                                        <td class="positive">+$346.80 (+1.42%)</td>
+                                        <td class="positive">+$5,034.60 (+25.55%)</td>
+                                        <td>$24,741.60</td>
+                                        <td>19.26%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="MSFT" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="MSFT" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="MSFT" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>GOOGL</td>
+                                        <td>Alphabet Inc.</td>
+                                        <td>40</td>
+                                        <td>$142.18</td>
+                                        <td>$178.32</td>
+                                        <td class="positive">+$85.60 (+1.21%)</td>
+                                        <td class="positive">+$1,445.60 (+25.42%)</td>
+                                        <td>$7,132.80</td>
+                                        <td>5.55%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="GOOGL" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="GOOGL" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="GOOGL" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>AMZN</td>
+                                        <td>Amazon.com Inc.</td>
+                                        <td>35</td>
+                                        <td>$178.34</td>
+                                        <td>$196.48</td>
+                                        <td class="negative">-$43.05 (-0.62%)</td>
+                                        <td class="positive">+$634.90 (+10.17%)</td>
+                                        <td>$6,876.80</td>
+                                        <td>5.35%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="AMZN" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="AMZN" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="AMZN" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>NVDA</td>
+                                        <td>NVIDIA Corporation</td>
+                                        <td>25</td>
+                                        <td>$624.85</td>
+                                        <td>$875.62</td>
+                                        <td class="positive">+$309.50 (+1.43%)</td>
+                                        <td class="positive">+$6,269.25 (+40.13%)</td>
+                                        <td>$21,890.50</td>
+                                        <td>17.04%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="NVDA" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="NVDA" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="NVDA" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>JNJ</td>
+                                        <td>Johnson & Johnson</td>
+                                        <td>80</td>
+                                        <td>$152.45</td>
+                                        <td>$168.32</td>
+                                        <td class="positive">+$67.20 (+0.50%)</td>
+                                        <td class="positive">+$1,269.60 (+10.41%)</td>
+                                        <td>$13,465.60</td>
+                                        <td>10.48%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="JNJ" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="JNJ" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="JNJ" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>V</td>
+                                        <td>Visa Inc.</td>
+                                        <td>45</td>
+                                        <td>$256.78</td>
+                                        <td>$285.42</td>
+                                        <td class="positive">+$46.35 (+0.36%)</td>
+                                        <td class="positive">+$1,288.80 (+11.15%)</td>
+                                        <td>$12,843.90</td>
+                                        <td>10.00%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="V" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="V" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="V" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="position-row">
+                                        <td>XOM</td>
+                                        <td>Exxon Mobil Corp.</td>
+                                        <td>65</td>
+                                        <td>$103.45</td>
+                                        <td>$118.57</td>
+                                        <td class="negative">-$43.55 (-0.56%)</td>
+                                        <td class="positive">+$982.80 (+14.62%)</td>
+                                        <td>$7,707.05</td>
+                                        <td>6.00%</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm action-btn buy-btn" data-ticker="XOM" data-bs-toggle="tooltip" title="Buy"><i class="fas fa-plus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn sell-btn" data-ticker="XOM" data-bs-toggle="tooltip" title="Sell"><i class="fas fa-minus-circle"></i></button>
+                                                <button class="btn btn-sm action-btn chart-btn" data-ticker="XOM" data-bs-toggle="tooltip" title="View Chart"><i class="fas fa-chart-line"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="real-time-badge">
+                            <span><i class="fas fa-broadcast-tower pulse"></i> Live Data</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="glass-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Transactions</h5>
+                        <div class="transaction-list">
+                            <div class="transaction-item">
+                                <div class="transaction-icon buy">
+                                    <i class="fas fa-arrow-alt-circle-down"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="transaction-info">
+                                        <span class="transaction-type">Buy</span>
+                                        <span class="transaction-ticker">NVDA</span>
+                                    </div>
+                                    <div class="transaction-date">April 5, 2025</div>
+                                </div>
+                                <div class="transaction-amount">
+                                    <div class="transaction-shares">5 shares</div>
+                                    <div class="transaction-value">$4,356.75</div>
+                                </div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-icon sell">
+                                    <i class="fas fa-arrow-alt-circle-up"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="transaction-info">
+                                        <span class="transaction-type">Sell</span>
+                                        <span class="transaction-ticker">TSLA</span>
+                                    </div>
+                                    <div class="transaction-date">April 3, 2025</div>
+                                </div>
+                                <div class="transaction-amount">
+                                    <div class="transaction-shares">10 shares</div>
+                                    <div class="transaction-value">$2,387.20</div>
+                                </div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-icon deposit">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="transaction-info">
+                                        <span class="transaction-type">Deposit</span>
+                                    </div>
+                                    <div class="transaction-date">April 1, 2025</div>
+                                </div>
+                                <div class="transaction-amount">
+                                    <div class="transaction-value">$5,000.00</div>
+                                </div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-icon buy">
+                                    <i class="fas fa-arrow-alt-circle-down"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="transaction-info">
+                                        <span class="transaction-type">Buy</span>
+                                        <span class="transaction-ticker">AAPL</span>
+                                    </div>
+                                    <div class="transaction-date">March 28, 2025</div>
+                                </div>
+                                <div class="transaction-amount">
+                                    <div class="transaction-shares">15 shares</div>
+                                    <div class="transaction-value">$3,642.45</div>
+                                </div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-icon dividend">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="transaction-info">
+                                        <span class="transaction-type">Dividend</span>
+                                        <span class="transaction-ticker">JNJ</span>
+                                    </div>
+                                    <div class="transaction-date">March 25, 2025</div>
+                                </div>
+                                <div class="transaction-amount">
+                                    <div class="transaction-value">$78.40</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-light">View All Transactions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="glass-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Performance Analysis</h5>
+                        <div class="performance-metrics">
+                            <div class="metric-row">
+                                <div class="metric-label">Daily Return</div>
+                                <div class="metric-value positive">+0.99%</div>
+                                <div class="metric-benchmark">S&P 500: +0.49%</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Weekly Return</div>
+                                <div class="metric-value positive">+2.34%</div>
+                                <div class="metric-benchmark">S&P 500: +1.82%</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Monthly Return</div>
+                                <div class="metric-value positive">+5.67%</div>
+                                <div class="metric-benchmark">S&P 500: +4.21%</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">YTD Return</div>
+                                <div class="metric-value positive">+18.45%</div>
+                                <div class="metric-benchmark">S&P 500: +12.73%</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">1 Year Return</div>
+                                <div class="metric-value positive">+28.42%</div>
+                                <div class="metric-benchmark">S&P 500: +21.56%</div>
+                            </div>
+                        </div>
+                        <div class="performance-chart-container mt-4">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Portfolio vs. S&P 500 (YTD)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="glass-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tax Information</h5>
+                        <div class="tax-summary">
+                            <div class="tax-year">
+                                <select class="form-select custom-input" id="taxYear">
+                                    <option value="2025">2025 (Year to date)</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+                            <div class="tax-metrics mt-4">
+                                <div class="tax-metric">
+                                    <div class="metric-name">Short-Term Gains</div>
+                                    <div class="metric-value">$3,845.21</div>
+                                </div>
+                                <div class="tax-metric">
+                                    <div class="metric-name">Long-Term Gains</div>
+                                    <div class="metric-value">$8,765.42</div>
+                                </div>
+                                <div class="tax-metric">
+                                    <div class="metric-name">Qualified Dividends</div>
+                                    <div class="metric-value">$1,234.56</div>
+                                </div>
+                                <div class="tax-metric">
+                                    <div class="metric-name">Non-Qualified Dividends</div>
+                                    <div class="metric-value">$345.67</div>
+                                </div>
+                                <div class="tax-metric">
+                                    <div class="metric-name">Estimated Tax Liability</div>
+                                    <div class="metric-value">$2,841.23</div>
+                                </div>
+                                <div class="tax-metric total">
+                                    <div class="metric-name">Total Taxable Events</div>
+                                    <div class="metric-value">$14,190.86</div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-light">Download Tax Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Modal -->
+    <div class="modal fade" id="tradeModal" tabindex="-1" aria-labelledby="tradeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tradeModalLabel">Trade Securities</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-pills mb-3" id="tradeType" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="buy-tab" data-bs-toggle="pill" data-bs-target="#buy" type="button" role="tab" aria-controls="buy" aria-selected="true">Buy</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="sell-tab" data-bs-toggle="pill" data-bs-target="#sell" type="button" role="tab" aria-controls="sell" aria-selected="false">Sell</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="tradeTypeContent">
+                        <div class="tab-pane fade show active" id="buy" role="tabpanel" aria-labelledby="buy-tab">
+                            <form id="buyForm">
+                                <div class="mb-3">
+                                    <label for="buySymbol" class="form-label">Symbol</label>
+                                    <input type="text" class="form-control custom-input" id="buySymbol" placeholder="e.g., AAPL">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buyShares" class="form-label">Shares</label>
+                                    <input type="number" min="1" step="1" class="form-control custom-input" id="buyShares">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buyPrice" class="form-label">Current Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control custom-input" id="buyPrice" readonly>
+                                        <button class="btn btn-outline-light" type="button" id="refreshPrice">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buyOrderType" class="form-label">Order Type</label>
+                                    <select class="form-select custom-input" id="buyOrderType">
+                                        <option value="market" selected>Market</option>
+                                        <option value="limit">Limit</option>
+                                        <option value="stop">Stop</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 d-none" id="limitPriceDiv">
+                                    <label for="limitPrice" class="form-label">Limit Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" class="form-control custom-input" id="limitPrice">
+                                    </div>
+                                </div>
+                                <div class="total-section">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Estimated Cost:</span>
+                                        <span id="estimatedCost">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Trading Fee:</span>
+                                        <span>$0.00</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <span>Total:</span>
+                                        <span id="totalCost">$0.00</span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="sell" role="tabpanel" aria-labelledby="sell-tab">
+                            <form id="sellForm">
+                                <div class="mb-3">
+                                    <label for="sellPosition" class="form-label">Position</label>
+                                    <select class="form-select custom-input" id="sellPosition">
+                                        <option value="" disabled selected>Select a position</option>
+                                        <option value="AAPL">AAPL - Apple Inc. (85 shares)</option>
+                                        <option value="MSFT">MSFT - Microsoft Corporation (60 shares)</option>
+                                        <option value="GOOGL">GOOGL - Alphabet Inc. (40 shares)</option>
+                                        <option value="AMZN">AMZN - Amazon.com Inc. (35 shares)</option>
+                                        <option value="NVDA">NVDA - NVIDIA Corporation (25 shares)</option>
+                                        <option value="JNJ">JNJ - Johnson & Johnson (80 shares)</option>
+                                        <option value="V">V - Visa Inc. (45 shares)</option>
+                                        <option value="XOM">XOM - Exxon Mobil Corp. (65 shares)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sellShares" class="form-label">Shares to Sell</label>
+                                    <input type="number" min="1" step="1" class="form-control custom-input" id="sellShares">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sellPrice" class="form-label">Current Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control custom-input" id="sellPrice" readonly>
+                                        <button class="btn btn-outline-light" type="button" id="refreshSellPrice">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sellOrderType" class="form-label">Order Type</label>
+                                    <select class="form-select custom-input" id="sellOrderType">
+                                        <option value="market" selected>Market</option>
+                                        <option value="limit">Limit</option>
+                                        <option value="stop">Stop</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 d-none" id="sellLimitPriceDiv">
+                                    <label for="sellLimitPrice" class="form-label">Limit Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" class="form-control custom-input" id="sellLimitPrice">
+                                    </div>
+                                </div>
+                                <div class="total-section">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Estimated Proceeds:</span>
+                                        <span id="estimatedProceeds">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Trading Fee:</span>
+                                        <span>$0.00</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <span>Total:</span>
+                                        <span id="totalProceeds">$0.00</span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-gradient" id="executeTradeBtn">Execute Trade</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deposit Modal -->
+    <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="depositModalLabel">Deposit Funds</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="depositForm">
+                        <div class="mb-3">
+                            <label for="depositAmount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" min="1" step="0.01" class="form-control custom-input" id="depositAmount" placeholder="Enter amount">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fundingSource" class="form-label">Funding Source</label>
+                            <select class="form-select custom-input" id="fundingSource">
+                                <option value="bank1">Bank of America - Checking (...1234)</option>
+                                <option value="bank2">Chase - Savings (...5678)</option>
+                                <option value="new">+ Add New Funding Source</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="newFundingDiv">
+                            <label for="bankName" class="form-label">Bank Name</label>
+                            <input type="text" class="form-control custom-input mb-3" id="bankName">
+                            
+                            <label for="accountType" class="form-label">Account Type</label>
+                            <select class="form-select custom-input mb-3" id="accountType">
+                                <option value="checking">Checking</option>
+                                <option value="savings">Savings</option>
+                            </select>
+                            
+                            <label for="routingNumber" class="form-label">Routing Number</label>
+                            <input type="text" class="form-control custom-input mb-3" id="routingNumber">
+                            
+                            <label for="accountNumber" class="form-label">Account Number</label>
+                            <input type="text" class="form-control custom-input" id="accountNumber">
+                        </div>
+                        <div class="mb-3">
+                            <label for="depositFrequency" class="form-label">Frequency</label>
+                            <select class="form-select custom-input" id="depositFrequency">
+                                <option value="oneTime" selected>One-time</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="recurringDepositDiv">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control custom-input" id="startDate">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-gradient" id="depositBtn">Deposit Funds</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-chart-line me-2"></i>StockPredictAI</h5>
+                    <p>Advanced stock price prediction using machine learning and explainable AI techniques to provide transparent insights for your investment decisions.</p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Features</h5>
+                    <ul class="footer-links">
+                        <li><a href="/">Predictions</a></li>
+                        <li><a href="/market-news">News</a></li>
+                        <li><a href="/watchlist">Watchlist</a></li>
+                        <li><a href="/portfolio">Portfolio</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>Resources</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Stay Updated</h5>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control custom-input" placeholder="Your Email" aria-label="Your Email">
+                        <button class="btn btn-gradient" type="button">Subscribe</button>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <p class="copyright">© 2025 StockPredictAI. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+</body>
+</html>
